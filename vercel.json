@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "playlist/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "playlist/main.py"
+    }
+  ]
+}
