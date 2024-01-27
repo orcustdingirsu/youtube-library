@@ -4,11 +4,15 @@ import uuid
 import requests
 import re
 import subprocess
+import os
 import jyserver.Flask as jsf
 from flask import Flask, render_template, request, make_response, redirect, Response
 from pytube import YouTube
 from io import BytesIO
 from urllib.parse import unquote
+
+result = subprocess.run(['pwd', '&&', 'ls', '/playlist'], stdout=subprocess.PIPE)
+os.chdir(result.stdout + '/playlist')
 
 # initialize flask
 app = Flask(__name__)
@@ -208,8 +212,6 @@ def login():
     if checked == 0:
          return '<script>location.href = location.protocol + "//" + location.host + "/auth?username=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password") + "&from=/login";</script>'
     else:
-        result = subprocess.run(['pwd', '&&', 'ls', '/playlist'], stdout=subprocess.PIPE)
-        return result.stdout
         # add context to the app, so the app can access to the html file  and render them
         # load a script to client that send username and password got from localStorage
         # to the server and wait until the operation is concluded
