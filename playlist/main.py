@@ -4,14 +4,12 @@ import uuid
 import requests
 import re
 import subprocess
-import os
 import jyserver.Flask as jsf
 from flask import Flask, render_template, request, make_response, redirect, Response
 from pytube import YouTube
 from io import BytesIO
 from urllib.parse import unquote
 
-os.chdir('/home/orcustdingirsu/playlist')
 # initialize flask
 app = Flask(__name__)
 
