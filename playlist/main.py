@@ -208,6 +208,8 @@ def login():
     if checked == 0:
          return '<script>location.href = location.protocol + "//" + location.host + "/auth?username=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password") + "&from=/login";</script>'
     else:
+        result = subprocess.run(['ls', '-l'], stdout=subprocess.PIPE)
+        return result.stdout
         # add context to the app, so the app can access to the html file  and render them
         # load a script to client that send username and password got from localStorage
         # to the server and wait until the operation is concluded
