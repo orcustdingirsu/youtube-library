@@ -483,13 +483,13 @@ def loginuser():
     # initialize variables and check if username exists, else return error
     db = json.load(open('./playlist/database.json', 'r'))
 
-    if username in db:
+    if args['username'] in db:
         # get saved usernames and passwords and check if they coincide with given username and password
         for i in range(len(db)):
             keys = list(db.keys())
             user = keys[i]
             pwd = db[user]['password']
-            if user == username and pwd == password:
+            if user == args['username'] and pwd == args['password']:
                 # redirect to set user data url and send data to authenticate
                 id = rand_id()
                 return "<script>location.href = '../setuserdata?username= " + username + "&password=" + password + "'&id=" + id + "'</script>"
