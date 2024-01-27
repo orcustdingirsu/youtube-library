@@ -3,24 +3,29 @@ import json
 import uuid
 import requests
 import re
+import subprocess
+import os
 import jyserver.Flask as jsf
 from flask import Flask, render_template, request, make_response, redirect, Response
 from pytube import YouTube
 from io import BytesIO
 from urllib.parse import unquote
 
+os.chdir('/home/orcustdingirsu/playlist')
 # initialize flask
 app = Flask(__name__)
 
 # constants
-GET_USER_DATA = "<script>server.getItem([localStorage.getItem('username'), localStorage.getItem('password')]);</script>"
+GET_USER_DATA = '<script>fetch(location.protocol + "//" + location.host + "/auth?username=" server.getItem([localStorage.getItem("username") + "&password=" + localStorage.getItem("password")]);</script>'
 REDIRECT_LOGIN_PAGE = '<script>location.href = location.protocol + "//" + location.host + "/login";</script>'
+REDIRECT_SIGNIN_PAGE = '<script>location.href = location.protocol + "//" + location.host + "/signin";</script>'
 REDIRECT_APP_PAGE = '<script>location.href = location.protocol + "//" + location.host;</script>'
 
 # user data variables and done variable to check if the user data variables have been got
 username = ''
 password = ''
 done = 0
+checked = 0
 
 #get randon id
 def rand_id():
@@ -48,7 +53,6 @@ def getYoutubeId(url):
     regExp = r'(https?://)?(www\.)?((youtube\.(com))/watch\?v=([-\w]+)|youtu\.be/([-\w]+))'
     id = re.match(regExp, url).group(0)
     return id[-11:]
-
 
 # initialize jyserver
 @jsf.use(app)
@@ -100,22 +104,20 @@ class App:
                     jsonFile.write(json.dumps(db, indent=4))
                 self.js.load_videos()
     # login function
-    def login(self):
+    def login(self, username, password):
         # initialize variables and check if username exists, else return error
-        self.username = str(self.js.document.getElementById('username').value)
-        self.password = str(self.js.document.getElementById('password').value)
         db = json.load(open('database.json', 'r'))
 
-        if self.username in db:
+        if username in db:
             # get saved usernames and passwords and check if they coincide with given username and password
             for i in range(len(db)):
                 keys = list(db.keys())
                 user = keys[i]
                 pwd = db[user]['password']
-                if user == self.username and pwd == self.password:
+                if user == username and pwd == password:
                     # redirect to set user data url and send data to authenticate
                     id = rand_id()
-                    self.js.window.location.href = request.url_root + '../setuserdata?username=' + self.username + '&password=' + self.password + '&id=' + id
+                    self.js.window.location.href = request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id
             # catch error
             self.js.window.alert('password errata')
         else:
@@ -196,14 +198,13 @@ class App:
 @app.route('/')
 def index():
     # add context to the app, so the app can access to the html file  and render them
-    with app.app_context():
-        # load a script to client that send username and password got from localStorage
-        # to the server and wait until the operation is concluded
-        global username, password, done
-        yield App.render(GET_USER_DATA)
-        while done == 0:
-            pass
-        done = 0
+    # load a script to client that send username and password got from localStorage
+    # to the server and wait until the operation is concluded
+    global username, password, done, checked
+    
+    if checked == 0:
+        return '<script>location.href = location.protocol + "//" + location.host + "/auth?username=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password") + "&from=/";</script>'
+    else:
         # check if username and password exist from localStorage, else gives login page
         if username != '' and password != '':
             # check if username from cookie exist in database, else fives login page
@@ -216,29 +217,24 @@ def index():
                     user = keys[i]
                     pwd = db[user]['password']
                     if user == username and pwd == password:
-                        yield App.render(render_template('/app/index.html'))
-                        raise StopIteration
-                yield REDIRECT_LOGIN_PAGE
-                raise StopIteration
+                        return App.render(render_template('/app/index.html'))
+                return REDIRECT_LOGIN_PAGE
             else:
-                yield REDIRECT_LOGIN_PAGE
-                raise StopIteration
+                return REDIRECT_LOGIN_PAGE
         else:
-            yield REDIRECT_LOGIN_PAGE
-            raise StopIteration
+            return REDIRECT_LOGIN_PAGE
 
 # initialize login url
 @app.route('/login')
 def login():
-    # add context to the app, so the app can access to the html file  and render them
-    with app.app_context():
+    global checked
+    
+    if checked == 0:
+         return '<script>location.href = location.protocol + "//" + location.host + "/auth?username=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password") + "&from=/login";</script>'
+    else:
+        # add context to the app, so the app can access to the html file  and render them
         # load a script to client that send username and password got from localStorage
         # to the server and wait until the operation is concluded
-        global username, password, done
-        yield App.render(GET_USER_DATA)
-        while done == 0:
-            pass
-        done = 0
         # check if username and password exist from localStorage, else gives login page
         if username != '' and password != '':
             # check if username from cookie exist in database, else gives login page
@@ -251,29 +247,24 @@ def login():
                     user = keys[i]
                     pwd = db[user]['password']
                     if user == username and pwd == password:
-                        yield REDIRECT_APP_PAGE
-                        raise StopIteration
-                yield App.render(render_template('/login/index.html'))
-                raise StopIteration
+                        return REDIRECT_APP_PAGE
+                return App.render(render_template('/login/index.html'))
             else:
-                yield App.render(render_template('/login/index.html'))
-                raise StopIteration
+                return App.render(render_template('/login/index.html'))
         else:
-            yield App.render(render_template('/login/index.html'))
-            raise StopIteration
+            return App.render(render_template('/login/index.html'))
 
 # initialize signin url
 @app.route('/signin')
 def signin():
-    # add context to the app, so the app can access to the html file  and render them
-    with app.app_context():
+    global checked
+    
+    if checked == 0:
+         return '<script>location.href = location.protocol + "//" + location.host + "/auth?username=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password") + "&from=/signin";</script>'
+    else:
+        # add context to the app, so the app can access to the html file  and render them
         # load a script to client that send username and password got from localStorage
         # to the server and wait until the operation is concluded
-        global username, password, done
-        yield App.render(GET_USER_DATA)
-        while done == 0:
-            pass
-        done = 0
         # check if username and password exist from localStorage, else gives signin page
         if username != '' and password != '':
             # check if username from cookie exist in database, else gives signin page
@@ -286,16 +277,12 @@ def signin():
                     user = keys[i]
                     pwd = db[user]['password']
                     if user == username and pwd == password:
-                        yield REDIRECT_APP_PAGE
-                        raise StopIteration
-                yield App.render(render_template('/signin/index.html'))
-                raise StopIteration
+                        return REDIRECT_APP_PAGE
+                return App.render(render_template('/signin/index.html'))
             else:
-                yield App.render(render_template('/signin/index.html'))
-                raise StopIteration
+                return App.render(render_template('/signin/index.html'))
         else:
-            yield App.render(render_template('/signin/index.html'))
-            raise StopIteration
+            return App.render(render_template('/signin/index.html'))
 
 # initialize cookie url
 @app.route('/setuserdata')
@@ -497,6 +484,22 @@ def video():
         #return Response(generate(url, headers, chunk_size), mimetype = mime_type)
         # Verifica che la richiesta sia andata a buon fine
         #return Response(BytesIO(divide(response.content, chunk_bytes)), mimetype=mime_type)
+        
+@app.route('/auth')
+def getitem():
+    global username, password, checked
+    args = request.args
+    username = '' if args['username'] == 'null' else args['username']
+    password = '' if args['password'] == 'null' else args['password']
+    checked = 1
+    if args['from'] == '/':
+        return REDIRECT_APP_PAGE
+    elif args['from'] == '/login':
+        return REDIRECT_LOGIN_PAGE
+    elif args['from'] == '/signin':
+        return REDIRECT_SIGNIN_PAGE
+    else:
+        return ''
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
