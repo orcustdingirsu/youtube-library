@@ -492,12 +492,12 @@ def loginuser():
             if user == username and pwd == password:
                 # redirect to set user data url and send data to authenticate
                 id = rand_id()
-                redirect(request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id)
+                return redirect(request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id)
         # catch error
-        redirect('../login')
+        return redirect('../login')
     else:
         # catch error
-        redirect('../login')
+        return redirect('../login')
     
 
 if __name__ == '__main__':
