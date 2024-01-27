@@ -8,7 +8,6 @@ from flask import Flask, render_template, request, make_response, redirect, Resp
 from pytube import YouTube
 from io import BytesIO
 from urllib.parse import unquote
-from moviepy.editor import VideoFileClip
 
 # initialize flask
 app = Flask(__name__)
@@ -50,20 +49,6 @@ def getYoutubeId(url):
     id = re.match(regExp, url).group(0)
     return id[-11:]
 
-def generate(url, headers, chunk_size):
-    start_time = 0
-    response = requests.get(url, headers = headers, stream=True)
-    total_size = int(response.headers.get('content-length', 0))
-
-    with VideoFileClip(url) as video:
-        duration = video.duration
-
-    start_byte = int(total_size * start_time / duration)
-    end_byte = total_size
-
-    for chunk in response.iter_content(chunk_size=chunk_size):
-        if chunk:
-            yield chunk
 
 # initialize jyserver
 @jsf.use(app)
@@ -501,9 +486,6 @@ def video():
         #r = requests.get(url, headers = headers, stream = True
         r = requests.head(url, headers = headers)
         total_size = int(r.headers.get('content-length', 0))
-
-        with VideoFileClip(url) as video:
-            duration = video.duration
 
         response_headers = {
         'Content-Type': mime_type,
