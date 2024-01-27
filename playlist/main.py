@@ -124,19 +124,17 @@ class App:
             # catch error
             self.js.window.alert("l'utente selezionato non esiste")
     # singin function
-    def signin(self):
+    def signin(self, username, password):
         # initialize variables and check if username exists, else gives error
-        self.username = str(self.js.document.getElementById('username').value)
-        self.password = str(self.js.document.getElementById('password').value)
         db = json.load(open('database.json', 'r'))
-        if self.username not in db:
+        if username not in db:
             # create a new username and save it
-            db[self.username] = {'password': self.password}
+            db[username] = {'password': password}
             with open('database.json', 'w') as jsonFile:
                 jsonFile.write(json.dumps(db, indent=4))
             # redirect to setuserdata url and send data to authenticate
             id = rand_id()
-            self.js.window.location.href = request.url_root + '../setuserdata?username=' + self.username + '&password=' + self.password + '&id=' + id
+            self.js.window.location.href = request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id
         else:
             self.js.window.alert("lo username esiste gia'")
     def logout(self):
