@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/app/style.css">
+        <script src="/static/app/script.js" defer></script>
+    </head>
+    <body>
+        <input id="ytUrl" id="text" placeholder="URL">
+        <input id="author" type="text" placeholder="Autore">
+        <input id="title" type="text" placeholder="Titolo">
+        <button onclick="addSong()">add song</button>
+        <button onclick="playSongs()">Play</button>
+        <button onclick="logout()">Logout</button>
+        <button onclick="deleteAccount()">Delete Account</button>
+        <table></table>
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <select id="commonFormats"></select>
+                <button onclick="loadFormats()">Load formats</button>
+            </div>
+          
+        </div>
+    </body>
+</html>

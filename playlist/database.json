@@ -1,0 +1,68 @@
+{
+    "papa": {
+        "password": "papa",
+        "songs": {
+            "https://youtu.be/tAGnKpE4NCI?si=_ZX6XugrXJ_43xDR": {
+                "author": "Metallica",
+                "title": "Nothing Else Matters",
+                "formats": [
+                    "video/mp4 360p",
+                    "video/mp4 480p (no audio)",
+                    "video/webm 480p (no audio)",
+                    "video/mp4 360p (no audio)",
+                    "video/webm 360p (no audio)",
+                    "video/mp4 240p (no audio)",
+                    "video/webm 240p (no audio)",
+                    "video/mp4 144p (no audio)",
+                    "video/webm 144p (no audio)",
+                    "audio/mp4 48kbps",
+                    "audio/mp4 128kbps",
+                    "audio/webm 50kbps",
+                    "audio/webm 70kbps",
+                    "audio/webm 160kbps"
+                ],
+                "itags": []
+            },
+            "https://www.youtube.com/watch?v=hTWKbfoikeg": {
+                "author": "Nirvana",
+                "title": "Smells Like Teen Spirit",
+                "formats": [
+                    "video/mp4 360p",
+                    "video/mp4 720p",
+                    "video/mp4 1080p (no audio)",
+                    "video/webm 1080p (no audio)",
+                    "video/mp4 720p (no audio)",
+                    "video/webm 720p (no audio)",
+                    "video/mp4 480p (no audio)",
+                    "video/webm 480p (no audio)",
+                    "video/mp4 360p (no audio)",
+                    "video/webm 360p (no audio)",
+                    "video/mp4 240p (no audio)",
+                    "video/webm 240p (no audio)",
+                    "video/mp4 144p (no audio)",
+                    "video/webm 144p (no audio)",
+                    "audio/mp4 48kbps",
+                    "audio/mp4 128kbps",
+                    "audio/webm 50kbps",
+                    "audio/webm 70kbps",
+                    "audio/webm 160kbps"
+                ]
+            }
+        }
+    },
+    "ciao": {
+        "password": "dvjdoexjd@!?DSW"
+    },
+    "salve": {
+        "password": "DJH@!?WDhsq"
+    },
+    "pippo": {
+        "password": "462@!+?dwssAS"
+    },
+    "pluto": {
+        "password": "ed534@!?=fheSDF"
+    },
+    "buon": {
+        "password": "deioe385?!=SDEW"
+    }
+}
