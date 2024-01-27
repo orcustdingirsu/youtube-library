@@ -4,15 +4,11 @@ import uuid
 import requests
 import re
 import subprocess
-import os
 import jyserver.Flask as jsf
 from flask import Flask, render_template, request, make_response, redirect, Response
 from pytube import YouTube
 from io import BytesIO
 from urllib.parse import unquote
-
-result = subprocess.run(['pwd', '&&', 'ls', '/playlist'], stdout=subprocess.PIPE)
-os.chdir(result.stdout + '/playlist')
 
 # initialize flask
 app = Flask(__name__)
@@ -33,8 +29,8 @@ checked = 0
 def rand_id():
     # get random id and save it in a database and return the id
     id = uuid.uuid4().hex
-    db = json.load(open('id.json', 'r'))
-    with open('id.json', 'w') as f:
+    db = json.load(open('./playlist/id.json', 'r'))
+    with open('./playlist/id.json', 'w') as f:
         ip = request.environ['REMOTE_ADDR']
         db[ip] = id
         f.write(json.dumps(db, indent=4))
@@ -73,7 +69,7 @@ class App:
         self.username = str(self.js.localStorage.getItem('username'))
         self.password = str(self.js.localStorage.getItem('password'))
         streams = YouTube(url).streams
-        db = json.load(open('database.json', 'r'))
+        db = json.load(open('./playlist/database.json', 'r'))
         formats = []
         
         # get formats data from youtube video
@@ -96,23 +92,23 @@ class App:
                         return 0
                 # add video data to the 'songs' element
                 db[self.username]['songs'].update({url: {'author': author, 'title': title, 'formats': formats}})
-                with open('database.json', 'w') as jsonFile:
+                with open('./playlist/database.json', 'w') as jsonFile:
                     jsonFile.write(json.dumps(db, indent=4))
                 self.js.load_videos()
             else:
                 # create 'songs' element with vieo data in the database
                 db[self.username]['songs'] = {url: {'author': author, 'title': title, 'formats': formats}}
-                with open('database.json', 'w') as jsonFile:
+                with open('./playlist/database.json', 'w') as jsonFile:
                     jsonFile.write(json.dumps(db, indent=4))
                 self.js.load_videos()
     # singin function
     def signin(self, username, password):
         # initialize variables and check if username exists, else gives error
-        db = json.load(open('database.json', 'r'))
+        db = json.load(open('./playlist/database.json', 'r'))
         if username not in db:
             # create a new username and save it
             db[username] = {'password': password}
-            with open('database.json', 'w') as jsonFile:
+            with open('./playlist/database.json', 'w') as jsonFile:
                 jsonFile.write(json.dumps(db, indent=4))
             # redirect to setuserdata url and send data to authenticate
             id = rand_id()
@@ -124,7 +120,7 @@ class App:
         # else gives error
         self.username = str(self.js.localStorage.getItem('username'))
         self.password = str(self.js.localStorage.getItem('password'))
-        db = json.load(open('database.json', 'r'))
+        db = json.load(open('./playlist/database.json', 'r'))
 
         if db[self.username] and db[self.username]['password'] == self.password:
             # redirect to removeuserdata url and send data to authenticate
@@ -137,12 +133,12 @@ class App:
         # else gives error
         self.username = str(self.js.localStorage.getItem('username'))
         self.password = str(self.js.localStorage.getItem('password'))
-        db = json.load(open('database.json', 'r'))
+        db = json.load(open('./playlist/database.json', 'r'))
 
         if db[self.username] and db[self.username]['password'] == self.password:
             # delete the user from the database and
             # redirect to removeuserdata url and data to authenticate
-            with open('database.json', 'w') as f:
+            with open('./playlist/database.json', 'w') as f:
                 del db[self.username]
                 f.write(json.dumps(db, indent=4))
             id = rand_id()
@@ -157,13 +153,13 @@ class App:
         password = data[1] if data[1] != None else ''
         done = 1
     def deleteSong(self, username, password, url):
-        db = json.load(open('database.json'))
+        db = json.load(open('./playlist/database.json'))
 
         if db[username]:
             if db[username]['password'] == password:
                 if db[username]['songs']:
                     if db[username]['songs'][url]:
-                        with open('database.json', 'w') as f:
+                        with open('./playlist/database.json', 'w') as f:
                             del db[username]['songs'][url]
                             f.write(json.dumps(db, indent=4))
                     else:
@@ -188,7 +184,7 @@ def index():
         # check if username and password exist from localStorage, else gives login page
         if username != '' and password != '':
             # check if username from cookie exist in database, else fives login page
-            db = json.load(open('database.json', 'r'))
+            db = json.load(open('./playlist/database.json', 'r'))
             if username in db:
                 # get saved usernames and passwords from database and check if they coincide with localStorage's
                 # username and password in order to acces to the app, else gives login page
@@ -218,7 +214,7 @@ def login():
         # check if username and password exist from localStorage, else gives login page
         if username != '' and password != '':
             # check if username from cookie exist in database, else gives login page
-            db = json.load(open('database.json', 'r'))
+            db = json.load(open('./playlist/database.json', 'r'))
             if username in db:
                 # get saved usernames and passwords from database and check if they coincide with localStorage's
                 # username and password in order to acces to the app, else gives login page
@@ -248,7 +244,7 @@ def signin():
         # check if username and password exist from localStorage, else gives signin page
         if username != '' and password != '':
             # check if username from cookie exist in database, else gives signin page
-            db = json.load(open('database.json', 'r'))
+            db = json.load(open('./playlist/database.json', 'r'))
             if username in db:
                 # get saved usernames and passwords from database and check if they coincide with localStorage's
                 # username and password in order to acces to the app, else gives signin page
@@ -272,7 +268,7 @@ def setuserdata():
     ip = request.environ['REMOTE_ADDR']
     if not 'id' in args.keys():
         return REDIRECT_LOGIN_PAGE
-    with open('id.json', 'r') as f:
+    with open('./playlist/id.json', 'r') as f:
         f = json.load(f)
         if f[ip]:
             # check if the random id and the query id coincide and then, if it is true,
@@ -302,7 +298,7 @@ def removeuserdata():
     if not 'id' in args.keys():
         return REDIRECT_LOGIN_PAGE
     # load the id database and check if the client ip is saved, else redirect login page
-    with open('id.json', 'r') as f:
+    with open('./playlist/id.json', 'r') as f:
         f = json.load(f)
         if f[ip]:
             # check if the random id and the query id coincide and then, if it is true,
@@ -326,7 +322,7 @@ def removeuserdata():
 def get_videos():
     # open the database
     args = request.args
-    db = json.load(open('database.json', 'r'))
+    db = json.load(open('./playlist/database.json', 'r'))
     data = []
 
     # check if the 'songs' element exists in the database and
@@ -351,7 +347,7 @@ def get_videos():
 def getvideoinfo():
     # get args and open the database
     args = request.args
-    db = json.load(open('database.json', 'r'))
+    db = json.load(open('./playlist/database.json', 'r'))
 
     # check if the username exists and check if the given password is correct
     if args['username'] and db[args['username']]['password'] == args['password']:
@@ -368,7 +364,7 @@ def getvideoinfo():
 def geturldata():
     # get args and open the database
     args = request.args
-    db = json.load(open('database.json', 'r'))
+    db = json.load(open('./playlist/database.json', 'r'))
 
     # check if the username exists and check if the given password is correct
     if args['username'] and db[args['username']]['password'] == args['password']:
@@ -386,7 +382,7 @@ def geturldata():
 @app.route('/get_video_urls')
 def getvideourls():
     args = request.args
-    db = json.load(open('database.json'))
+    db = json.load(open('./playlist/database.json'))
 
     if args['username'] and db[args['username']]['password'] == args['password']:
         #try:
@@ -485,7 +481,7 @@ def auth():
 def loginuser():
     args = request.args
     # initialize variables and check if username exists, else return error
-    db = json.load(open('database.json', 'r'))
+    db = json.load(open('./playlist/database.json', 'r'))
 
     if username in db:
         # get saved usernames and passwords and check if they coincide with given username and password
