@@ -101,26 +101,6 @@ class App:
                 with open('database.json', 'w') as jsonFile:
                     jsonFile.write(json.dumps(db, indent=4))
                 self.js.load_videos()
-    # login function
-    def login(self, username, password):
-        # initialize variables and check if username exists, else return error
-        db = json.load(open('database.json', 'r'))
-
-        if username in db:
-            # get saved usernames and passwords and check if they coincide with given username and password
-            for i in range(len(db)):
-                keys = list(db.keys())
-                user = keys[i]
-                pwd = db[user]['password']
-                if user == username and pwd == password:
-                    # redirect to set user data url and send data to authenticate
-                    id = rand_id()
-                    self.js.window.location.href = request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id
-            # catch error
-            self.js.window.alert('password errata')
-        else:
-            # catch error
-            self.js.window.alert("l'utente selezionato non esiste")
     # singin function
     def signin(self, username, password):
         # initialize variables and check if username exists, else gives error
@@ -482,7 +462,7 @@ def video():
         #return Response(BytesIO(divide(response.content, chunk_bytes)), mimetype=mime_type)
         
 @app.route('/auth')
-def getitem():
+def auth():
     global username, password, checked
     args = request.args
     username = '' if args['username'] == 'null' else args['username']
@@ -496,6 +476,29 @@ def getitem():
         return REDIRECT_SIGNIN_PAGE
     else:
         return ''
+
+@app.route('/loginuser')
+def loginuser():
+    args = request.args
+    # initialize variables and check if username exists, else return error
+    db = json.load(open('database.json', 'r'))
+
+    if username in db:
+        # get saved usernames and passwords and check if they coincide with given username and password
+        for i in range(len(db)):
+            keys = list(db.keys())
+            user = keys[i]
+            pwd = db[user]['password']
+            if user == username and pwd == password:
+                # redirect to set user data url and send data to authenticate
+                id = rand_id()
+                redirect(request.url_root + '../setuserdata?username=' + username + '&password=' + password + '&id=' + id)
+        # catch error
+        redirect('../login')
+    else:
+        # catch error
+        redirect('../login')
+    
 
 if __name__ == '__main__':
     app.run()
